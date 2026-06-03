@@ -1,23 +1,23 @@
 
 # Project Name
 
-Short description of what the project does and the problem it solves.
+A simple API Tasks created whit FastAPI, use the local memory to store tasks.
 
 ---
 
 ## Features
 
-* Feature 1
-* Feature 2
-* Feature 3
+* Create tasks
+* Read tasks
+* Update tasks
+* Delete tasks
 
 ---
 
 ## Tech Stack
 
-* Python
-* [Libraries / Frameworks]
-* [Other tools]
+* Python 3
+* FastAPI
 
 ---
 
@@ -26,8 +26,8 @@ Short description of what the project does and the problem it solves.
 Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd <project-name>
+git clone git@github.com:yorch-codes/task_api.git
+cd task_api
 ```
 
 Create environment and install dependencies:
@@ -43,13 +43,7 @@ uv sync
 Run the project:
 
 ```bash
-python src/main.py
-```
-
-Example:
-
-```bash
-project-command example-name
+python main.py
 ```
 
 ---
@@ -59,9 +53,11 @@ project-command example-name
 ```text
 project/
 ├── README.md
+├── main.py
 ├── docs/
-├── src/
-└── tests/
+│   ├── planning.md
+│   ├── architecture.md
+├── tests/
 ```
 
 ---
@@ -70,9 +66,8 @@ project/
 
 Additional project documentation:
 
-* Planning → `docs/planning.md`
-* Architecture → `docs/architecture.md`
-* Decisions → `docs/decisions.md` *(optional)*
+* Planning → [Planning](docs/planning.md)
+* Architecture → [Architecture](docs/architecture.md)
 
 ---
 
@@ -80,13 +75,15 @@ Additional project documentation:
 
 Planned improvements:
 
-* [ ] Feature 1
-* [ ] Feature 2
-* [ ] Feature 3
+* [ ] Data persistence
+* [ ] Authentication
+* [ ] Authorization
+* [ ] API documentation
+* [ ] Deployment
+* [ ] tests
 
 ---
 
 ## License
 
-[MIT / GPL / Private / TBD]
-
+MIT

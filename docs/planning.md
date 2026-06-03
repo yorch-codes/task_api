@@ -3,26 +3,25 @@
 
 ## Idea
 
-Quiero automatizar el arranque de mis proyectos para evitar empezar desde cero cada vez.
+Quiero crear un API simple para gestionar tareas.
 
 ## Problem
 
-Crear estructuras y documentación manualmente genera fricción y retrasa el inicio del proyecto.
+Crear endpoints para CRUD de tareas.
 
 ## Objetive
 
-Crear una CLI en Python que genere estructura y templates de documentación.
+Crear un API RESTful para gestionar tareas.
 
 ## MVP (Do it)
 
 Para mantenerlo aterrizado:
 
 ```shell
-✓ crear carpetas
-✓ generar README.md
-✓ generar docs/
-✓ templates base
-✓ recibir nombre proyecto
+✓ crud de tareas
+✓ persistencia de datos en memoria
+✓ FastAPI
+✓ test unitarios
 ```
 
 ## Don't do it (v1)
@@ -30,11 +29,9 @@ Para mantenerlo aterrizado:
 Aquí nos protegemos.
 
 ```shell
-✗ stacks múltiples
+✗ no persistencia en base de datos
 ✗ Docker automático
 ✗ FastAPI templates
-✗ TUI
-✗ colores
 ✗ IA
 ✗ configuración avanzada
 ```
@@ -42,14 +39,13 @@ Aquí nos protegemos.
 ## Flow
 
 ```shell
-Usuario ejecuta scaffold
+Usuario ejecuta proyecto
 ↓
-Ingresa nombre
+usuario consume endpoints
 ↓
-Se crean carpetas
+Se crean, leen, actualizan, eliminan tareas
 ↓
-Se generan .md
+Se cierra el programa
 ↓
-Confirmación final
+Se eliminan las tareas en memoria
 ```
-
