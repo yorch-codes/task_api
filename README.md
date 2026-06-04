@@ -18,6 +18,7 @@ A simple API Tasks created whit FastAPI, use the local memory to store tasks.
 
 * Python 3
 * FastAPI
+* Pytest
 
 ---
 
@@ -32,8 +33,33 @@ cd task_api
 
 Create environment and install dependencies:
 
+### Using uv
+
 ```bash
-uv sync
+# Create environment with uv
+uv venv
+```
+
+```bash
+# Use uv to install dependencies
+uv pip install -r requirements.txt
+```
+
+### Using pip
+
+```bash
+# Create environment with pip in windows
+python -m venv venv
+```
+
+```bash
+# Create environment with pip in linux/macOS
+python3 -m venv venv
+```
+
+```bash
+# Use pip to install dependencies
+pip install -r requirements.txt
 ```
 
 ---
@@ -43,7 +69,19 @@ uv sync
 Run the project:
 
 ```bash
+# Run the application in windows
 python main.py
+```
+
+```bash
+# Run the application in linux/MacOS
+python3 main.py
+```
+
+Run the tests:
+
+```bash
+pytest
 ```
 
 ---
@@ -63,9 +101,25 @@ project/
 
 ---
 
-## Documentation
+## API Documentation
 
-Additional project documentation:
+Once the server is running, interactive documentation is available at:
+
+[Swagger Interactive API Docs](http://localhost:8000/docs)
+
+### Postman Collection
+
+A Postman collection is included in the repository:
+
+[Postman Collection](postman/Task_API.postman_collection.json)
+
+Import it into Postman to test all endpoints quickly.
+
+---
+
+## Aditional Documentation
+
+Project documentation:
 
 * Planning → [Planning](docs/planning.md)
 * Architecture → [Architecture](docs/architecture.md)
@@ -79,8 +133,8 @@ Planned improvements:
 * [ ] Data persistence
 * [ ] Authentication
 * [ ] Authorization
-* [ ] API documentation
 * [ ] Deployment
+* [X] API documentation
 * [X] tests
 
 ---
