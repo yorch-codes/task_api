@@ -15,6 +15,7 @@ INITIAL_TASKS = [
 
 # Clean the tasks list before each test
 def setup_function():
+    """Set up the initial tasks before each test."""
     tasks.clear()
     tasks.extend(INITIAL_TASKS)
 
@@ -72,6 +73,7 @@ def test_update_task():
 
 
 def test_delete_task():
+    """Test the delete task endpoint."""
     response = client.delete("/tasks/1")
 
     assert response.status_code == 200
@@ -87,6 +89,7 @@ def test_delete_task():
 
 # Error tests
 def test_get_task_not_found():
+    """Test the get task not found endpoint."""
     response = client.get("/tasks/999")
 
     assert response.status_code == 404
@@ -94,6 +97,7 @@ def test_get_task_not_found():
 
 
 def test_update_task_not_found():
+    """Test the update task not found endpoint."""
     response = client.put(
         "/tasks/999",
         json={"task": "Test", "completed": False},
@@ -103,12 +107,14 @@ def test_update_task_not_found():
 
 
 def test_delete_task_not_found():
+    """Test the delete task not found endpoint."""
     response = client.delete("/tasks/999")
 
     assert response.status_code == 404
 
 
 def test_create_task_invalid_payload():
+    """Test the create task invalid payload endpoint."""
     response = client.post("/tasks/", json={"completed": False})
 
     assert response.status_code == 422
