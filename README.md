@@ -58,6 +58,7 @@ project/
 │   ├── planning.md
 │   ├── architecture.md
 ├── tests/
+    ├── test_main.py
 ```
 
 ---
@@ -80,7 +81,7 @@ Planned improvements:
 * [ ] Authorization
 * [ ] API documentation
 * [ ] Deployment
-* [ ] tests
+* [X] tests
 
 ---
 
