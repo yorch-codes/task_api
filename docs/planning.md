@@ -29,7 +29,6 @@ Para mantenerlo aterrizado:
 Aquí nos protegemos.
 
 ```shell
-✗ no persistencia en base de datos
 ✗ Docker automático
 ✗ FastAPI templates
 ✗ IA
