@@ -2,22 +2,9 @@
 
 from fastapi.testclient import TestClient
 
-from app.main import app, tasks
+from app.main import app
 
 client = TestClient(app)
-
-# Initial tasks for testing
-INITIAL_TASKS = [
-    {"id": 1, "task": "Aprender Flask", "completed": True},
-    {"id": 2, "task": "Aprender FastAPI", "completed": False},
-]
-
-
-# Clean the tasks list before each test
-def setup_function():
-    """Set up the initial tasks before each test."""
-    tasks.clear()
-    tasks.extend(INITIAL_TASKS)
 
 
 # Endpoints tests
@@ -35,46 +22,81 @@ def test_read_tasks():
     response = client.get("/tasks")
 
     assert response.status_code == 200
-
-    body = response.json()
-
-    assert "tasks" in body
-    assert isinstance(body["tasks"], list)
+    assert isinstance(response.json(), list)
 
 
 def test_create_task():
     """Test the create task endpoint."""
     response = client.post(
-        "/tasks/", json={"task": "Aprender pytest", "completed": False}
+        "/tasks/",
+        json={
+            "task": "Aprender pytest",
+            "description": "Testing",
+            "completed": False,
+        },
     )
 
     assert response.status_code == 200
 
     body = response.json()
 
-    assert body["id"] == 3
     assert body["task"] == "Aprender pytest"
+    assert body["description"] == "Testing"
     assert body["completed"] is False
+
+    assert "id" in body
+    assert "created_at" in body
+    assert "updated_at" in body
 
 
 def test_update_task():
     """Test the update task endpoint."""
+
+    created = client.post(
+        "/tasks/",
+        json={
+            "task": "Original",
+            "description": "Original",
+            "completed": False,
+        },
+    )
+
+    task_id = created.json()["id"]
+
     response = client.put(
-        "/tasks/1", json={"task": "Aprender pytest", "completed": True}
+        f"/tasks/{task_id}",
+        json={
+            "task": "Aprender pytest",
+            "description": "Actualizada",
+            "completed": True,
+        },
     )
 
     assert response.status_code == 200
 
     body = response.json()
 
-    assert body["id"] == 1
+    assert body["id"] == task_id
     assert body["task"] == "Aprender pytest"
+    assert body["description"] == "Actualizada"
     assert body["completed"] is True
 
 
 def test_delete_task():
     """Test the delete task endpoint."""
-    response = client.delete("/tasks/1")
+
+    created = client.post(
+        "/tasks/",
+        json={
+            "task": "Eliminar",
+            "description": "",
+            "completed": False,
+        },
+    )
+
+    task_id = created.json()["id"]
+
+    response = client.delete(f"/tasks/{task_id}")
 
     assert response.status_code == 200
 
@@ -82,7 +104,7 @@ def test_delete_task():
 
     assert body["message"] == "Task deleted successfully"
 
-    response = client.get("/tasks/1")
+    response = client.get(f"/tasks/{task_id}")
 
     assert response.status_code == 404
 

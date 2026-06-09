@@ -1,12 +1,15 @@
 """Task API endpoints."""
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from datetime import datetime
 
-tasks = [
-    {"id": 1, "task": "Aprender Flask", "completed": True},
-    {"id": 2, "task": "Aprender FastAPI", "completed": False},
-]
+from fastapi import Depends, FastAPI, HTTPException
+from pydantic import BaseModel, ConfigDict
+from sqlalchemy.orm import Session
+
+from app.db.database import Base, engine, get_db
+from app.models.task import Task
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -21,21 +24,21 @@ class TaskCreate(BaseModel):
     """
 
     task: str
+    description: str = ""
     completed: bool = False
 
 
 class TaskResponse(BaseModel):
-    """Represents a task response.
-
-    Attributes:
-        id (int): The task ID.
-        task (str): The task description.
-        completed (bool): Whether the task is completed or not.
-    """
+    """Represents a task response."""
 
     id: int
     task: str
+    description: str
     completed: bool
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 @app.get("/")
@@ -48,18 +51,18 @@ def root():
     return {"message": "Welcome to the Task API created whit FastAPI"}
 
 
-@app.get("/tasks")
-def get_tasks():
+@app.get("/tasks", response_model=list[TaskResponse])
+def get_tasks(db: Session = Depends(get_db)):
     """Get tasks endpoint that returns the list of tasks.
 
     Returns:
         dict: The list of tasks.
     """
-    return {"tasks": tasks}
+    return db.query(Task).all()
 
 
-@app.get("/tasks/{task_id}")
-def get_task(task_id: int):
+@app.get("/tasks/{task_id}", response_model=TaskResponse)
+def get_task(task_id: int, db: Session = Depends(get_db)):
     """Get a task by its ID.
 
     Args:
@@ -68,28 +71,39 @@ def get_task(task_id: int):
     Returns:
         dict: The task data.
     """
-    for task in tasks:
-        if task["id"] == task_id:
-            return task
+    task = db.query(Task).filter(Task.id == task_id).first()
 
-    raise HTTPException(status_code=404, detail="Task not found")
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return task
 
 
 @app.post("/tasks/", response_model=TaskResponse)
-def create_task(task: TaskCreate):
-    new_task = {
-        "id": len(tasks) + 1,
-        "task": task.task,
-        "completed": task.completed,
-    }
+def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+    """Create a new task.
 
-    tasks.append(new_task)
+    Args:
+        task (TaskCreate): The task data to create.
+
+    Returns:
+        dict: The created task data.
+    """
+    new_task = Task(
+        task=task.task,
+        description=task.description,
+        completed=task.completed,
+    )
+
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
 
     return new_task
 
 
 @app.put("/tasks/{task_id}", response_model=TaskResponse)
-def update_task(task_id: int, item: TaskCreate):
+def update_task(task_id: int, item: TaskCreate, db: Session = Depends(get_db)):
     """Update a task by its ID.
 
     Args:
@@ -99,17 +113,23 @@ def update_task(task_id: int, item: TaskCreate):
     Returns:
         TaskResponse: The updated task data.
     """
-    for task in tasks:
-        if task["id"] == task_id:
-            task["task"] = item.task
-            task["completed"] = item.completed
-            return task
+    task = db.query(Task).filter(Task.id == task_id).first()
 
-    raise HTTPException(status_code=404, detail="Task not found")
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task.task = item.task
+    task.description = item.description
+    task.completed = item.completed
+
+    db.commit()
+    db.refresh(task)
+
+    return task
 
 
 @app.delete("/tasks/{task_id}")
-def delete_task(task_id: int):
+def delete_task(task_id: int, db: Session = Depends(get_db)):
     """Delete a task by its ID.
 
     Args:
@@ -118,9 +138,12 @@ def delete_task(task_id: int):
     Returns:
         dict: The updated list of tasks.
     """
-    for task in tasks:
-        if task["id"] == task_id:
-            tasks.remove(task)
-            return {"message": "Task deleted successfully"}
+    task = db.query(Task).filter(Task.id == task_id).first()
 
-    raise HTTPException(status_code=404, detail="Task not found")
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    db.delete(task)
+    db.commit()
+
+    return {"message": "Task deleted successfully"}
