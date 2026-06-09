@@ -1,7 +1,7 @@
 
 # Task API
 
-A simple API Tasks created whit FastAPI, use the local memory to store tasks.
+A simple API Tasks created whit FastAPI, use the PostgreSQL database to store tasks with SQLAlchemy ORM.
 
 ---
 
@@ -16,8 +16,10 @@ A simple API Tasks created whit FastAPI, use the local memory to store tasks.
 
 ## Tech Stack
 
-* Python 3
+* Python3
 * FastAPI
+* PostgreSQL
+* SQLAlchemy
 * Pytest
 
 ---
@@ -70,12 +72,12 @@ Run the project:
 
 ```bash
 # Run the application in windows
-python main.py
+uvicorn app.main:app --reload
 ```
 
 ```bash
 # Run the application in linux/MacOS
-python3 main.py
+uvicorn app.main:app --reload
 ```
 
 Run the tests:
@@ -89,14 +91,26 @@ pytest
 ## Project Structure
 
 ```text
-project/
+task_api/
 ├── README.md
-├── main.py
+├── app/
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── task.py
+│   ├── main.py
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── database.py
 ├── docs/
 │   ├── planning.md
 │   ├── architecture.md
 ├── tests/
     ├── test_main.py
+├── postman/
+│   ├── Task_API.postman_collection.json
+├── requirements.txt
+├── .env
+├── .gitignore
 ```
 
 ---
@@ -106,6 +120,7 @@ project/
 Once the server is running, interactive documentation is available at:
 
 [Swagger Interactive API Docs](http://localhost:8000/docs)
+[ReDoc API Docs](http://localhost:8000/redoc)
 
 ### Postman Collection
 
@@ -130,7 +145,7 @@ Project documentation:
 
 Planned improvements:
 
-* [ ] Data persistence
+* [X] Data persistence
 * [ ] Authentication
 * [ ] Authorization
 * [ ] Deployment
