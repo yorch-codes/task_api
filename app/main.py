@@ -3,7 +3,8 @@
 from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.database import Base, engine, get_db
@@ -14,17 +15,18 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
+# Create & Response Task Models
 class TaskCreate(BaseModel):
     """Represents a task.
 
     Attributes:
-        id (int): The task ID.
-        task (str): The task description.
-        completed (bool): Whether the task is completed or not.
+        task (str): The task title.
+        description (str): The task description.
+        completed (bool): Task status.
     """
 
-    task: str
-    description: str = ""
+    task: str = Field(min_length=1, max_length=100)
+    description: str = Field(min_length=1, max_length=500)
     completed: bool = False
 
 
@@ -41,6 +43,7 @@ class TaskResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# Endpoints
 @app.get("/")
 def root():
     """Root endpoint that returns the API welcome message.
@@ -58,7 +61,9 @@ def get_tasks(db: Session = Depends(get_db)):
     Returns:
         dict: The list of tasks.
     """
-    return db.query(Task).all()
+    stmt = select(Task).order_by(Task.id.asc())
+    result = db.execute(stmt).scalars().all()
+    return result
 
 
 @app.get("/tasks/{task_id}", response_model=TaskResponse)
@@ -71,28 +76,28 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
     Returns:
         dict: The task data.
     """
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.get(Task, task_id)
 
-    if not task:
+    if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
 
     return task
 
 
 @app.post("/tasks/", response_model=TaskResponse)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
     """Create a new task.
 
     Args:
-        task (TaskCreate): The task data to create.
+        payload (TaskCreate): The task data to create.
 
     Returns:
         dict: The created task data.
     """
     new_task = Task(
-        task=task.task,
-        description=task.description,
-        completed=task.completed,
+        task=payload.task,
+        description=payload.description,
+        completed=payload.completed,
     )
 
     db.add(new_task)
@@ -103,7 +108,9 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/tasks/{task_id}", response_model=TaskResponse)
-def update_task(task_id: int, item: TaskCreate, db: Session = Depends(get_db)):
+def update_task(
+    task_id: int, payload: TaskCreate, db: Session = Depends(get_db)
+):
     """Update a task by its ID.
 
     Args:
@@ -113,14 +120,14 @@ def update_task(task_id: int, item: TaskCreate, db: Session = Depends(get_db)):
     Returns:
         TaskResponse: The updated task data.
     """
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.get(Task, task_id)
 
-    if not task:
+    if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    task.task = item.task
-    task.description = item.description
-    task.completed = item.completed
+    task.task = payload.task
+    task.description = payload.description
+    task.completed = payload.completed
 
     db.commit()
     db.refresh(task)
@@ -138,9 +145,9 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     Returns:
         dict: The updated list of tasks.
     """
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.get(Task, task_id)
 
-    if not task:
+    if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
 
     db.delete(task)

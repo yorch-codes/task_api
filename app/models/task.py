@@ -7,6 +7,10 @@ from app.db.database import Base
 
 
 class Task(Base):
+    """
+    Represents a task in the system.
+    """
+
     __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
