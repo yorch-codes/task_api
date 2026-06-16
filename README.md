@@ -110,7 +110,12 @@ pytest
 
 ```text
 task_api/
-├── README.md
+│   alembic/
+│   ├── versions/
+│   │   ├── 000000000_init_db.py
+│   ├── env.py
+│   ├── script.py.mako
+│   ├── README.md
 ├── app/
 │   ├── models/
 │   │   ├── __init__.py
@@ -129,6 +134,8 @@ task_api/
 ├── requirements.txt
 ├── .env
 ├── .gitignore
+├── alembic.ini
+├── README.md
 ```
 
 ---
