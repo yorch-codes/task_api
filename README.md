@@ -66,6 +66,24 @@ pip install -r requirements.txt
 
 ---
 
+## Create database migrations with alembic
+
+```bash
+alembic revision --autogenerate -m "create task table"
+```
+
+```bash
+# Apply the latest migration
+alembic upgrade head
+```
+
+```bash
+# Downgrade to the previous migration
+alembic downgrade -1
+```
+
+---
+
 ## Usage
 
 Run the project:
