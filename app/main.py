@@ -7,15 +7,13 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.database import Base, engine, get_db
+from app.db.database import get_db
 from app.models.task import Task
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-# Create & Response Task Models
+# Schemas
 class TaskCreate(BaseModel):
     """Represents a task.
 
